@@ -1,16 +1,33 @@
-# This is a sample Python script.
+import openpyxl as xl
+from openpyxl.chart import BarChart, Reference
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+def proccess_workbook(filename):
 
+    wb=xl.load_workbook(filename)
+    sheet=wb['Sheet1'] #get the first sheet
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+    title_cell = sheet.cell(1, 4)
+    title_cell.value='updated_price'
 
+    print(title_cell.value)
+    for row in range(2,sheet.max_row+1):
+        cell=sheet.cell(row,3)
+        print(cell.value)
+        corrected_value=cell.value*0.9
+        corrected_price_cell=sheet.cell(row,4)
+        corrected_price_cell.value=corrected_value
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+    #create a refernce to data in column 4
+    values=Reference(sheet,
+              min_row=2,
+              max_row=sheet.max_row,
+              min_col=4,
+              max_col=4)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    chart=BarChart()
+    chart.add_data(values)
+    sheet.add_chart(chart, 'e2') #add the chart and it's location
+    wb.save(filename)
+
+#calling to the function
+proccess_workbook('transactions2.xlsx')
